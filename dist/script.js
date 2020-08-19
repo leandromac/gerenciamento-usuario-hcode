@@ -1,9 +1,8 @@
 var inputName = document.querySelector("#exampleInputName");
-var inputGenerM = document.querySelector("#exampleInputGenderM");
-var inputGenerF = document.querySelector("#exampleInputGenderF");
+var inputGener = document.querySelectorAll("#form-user-create [name=gender]:checked");
 var inputBirth = document.querySelector("#exampleInputBirth");
 var inputCountry = document.querySelector("#exampleInputCountry");
-var inputEmail = document.querySelector("#exampleInputEmail1");
-var inputPassword = document.querySelector("#exampleInputPassword1");
+var inputEmail = document.querySelector("#exampleInputEmail");
+var inputPassword = document.querySelector("#exampleInputPassword");
 var inputFile = document.querySelector("#exampleInputFile");
-var checkAdmin = document.querySelector("[name='admin']");
+var checkAdmin = document.querySelector("#exampleInputAdmin");

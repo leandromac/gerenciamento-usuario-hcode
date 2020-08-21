@@ -40,9 +40,12 @@ class UserController {
       };
       fileReader.onError = (e) => {
         reject(e);
+      };
+      if(file) {
+        fileReader.readAsDataURL(file);
+      } else {
+        resolve('dist/img/boxed-bg.png');
       }
-      fileReader.readAsDataURL(file);
-
     });
 
   }

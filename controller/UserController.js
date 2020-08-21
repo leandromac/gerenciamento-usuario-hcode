@@ -57,7 +57,11 @@ class UserController {
         if(field.checked) {
           user[field.name] = field.value;
         }
-      } else {
+      }
+      else if(field.name == 'admin') {
+        user[field.name] = field.checked;
+      }
+      else {
         user[field.name] = field.value;
       }
     });
@@ -75,7 +79,6 @@ class UserController {
   }
 
   addLine(dataUser) {
-
     this.tableEl.innerHTML = `
       <tr>
         <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>

@@ -121,7 +121,7 @@ class UserController {
       let user = JSON.parse(tr.dataset.user);
       if(user._admin) numberAdmin++;
     });
-    document.getElementById['number-users'].innerHTML = numberUsers;
-    document.querySelector['#number-users-admin'].innerHTML = numberAdmin;
+    document.querySelector('#number-users').innerHTML = numberUsers;
+    document.querySelector('#number-users-admin').innerHTML = numberAdmin;
   }
 }

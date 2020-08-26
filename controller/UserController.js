@@ -1,19 +1,54 @@
 class UserController {
 
-  constructor(formId, tableId) {
-    this.formEl = document.getElementById(formId);
+  constructor(formIdCreate, formIdEdit, tableId) {
+    this.formEl = document.getElementById(formIdCreate);
+    this.formEdit = document.getElementById(formIdEdit);
     this.tableEl = document.getElementById(tableId);
     this.onSubmit();
+    this.onEdit();
+  }
+
+  onEdit() {
+    document.querySelector('#box-user-edit .btn-cancel').addEventListener('click', e => {
+      this.showBoxUserCreate();
+    });
+    this.formEdit.addEventListener("submit", event => {
+      event.preventDefault();
+      let btn = this.formEdit.querySelector("[type=submit]");
+      btn.desabled = true;
+      let values = this.getValues(this.formEdit);
+      console.log(formEdit);
+      let index = this.form.dataset.trIndex;
+      let tr = this.tableEl.rows[index];
+      this.tableEl.rows[index].dataset.user = JSON.stringify(values);
+      tr.innerHTML = `
+      <tr>
+        <td><img src="${values.photo}" alt="User Image" class="img-circle img-sm"></td>
+        <td>${values.name}</td>
+        <td>${values.email}</td>
+        <td>${(values.admin) ? 'Sim' : 'Não'}</td>
+        <td>${Utils.dateFormat(values.register)}</td>
+        <td>
+          <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
+          <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+        </td>
+      </tr>
+    `;
+    this.addEventsTr(tr);
+    this.updateCount();
+    });
   }
 
   onSubmit() {
 
     this.formEl.addEventListener("submit", event => {
+
       event.preventDefault();
       let btnSubmit = this.formEl.querySelector("[type=submit]");
       btnSubmit.disabled = true;
-      let values = this.getValues();
+      let values = this.getValues(this.formEl);
       if(!values) return false;
+
       this.getPhoto().then(
         (content) => {
           values.photo = content;
@@ -25,6 +60,7 @@ class UserController {
           console.error(e);
         }
       );
+
     });
     
   }
@@ -55,10 +91,10 @@ class UserController {
 
   }
 
-  getValues() {
+  getValues(formEl) {
     let user = {};
     let isValid = true;
-    [...this.formEl.elements].forEach(function(field, index) {
+    [...formEl.elements].forEach(function(field, index) {
       if(['name', 'email', 'password'].indexOf(field.name) > -1 && !field.value) {
         field.parentElement.classList.add('has-error');
         isValid = false;
@@ -103,24 +139,66 @@ class UserController {
         <td>${(dataUser.admin) ? 'Sim' : 'Não'}</td>
         <td>${Utils.dateFormat(dataUser.register)}</td>
         <td>
-          <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+          <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
           <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
         </td>
       </tr>
     `;
+    this.addEventsTr(tr);
     this.tableEl.appendChild(tr);
 
     this.updateCount();
   }
 
+  addEventsTr(tr) {
+    tr.querySelector(".btn-edit").addEventListener('click', e => {
+      let json = JSON.parse(tr.dataset.user);
+      let form = document.querySelector('#box-user-edit');
+      form.dataset.trIndex = tr.sectionRowIndex;
+      for (let name in json) {
+        let field = form.querySelector("[name=" + name.replace("_", "") + "]");
+        if(field) {
+          switch (field.type) {
+            case 'file':
+              continue;
+              break;
+            case 'radio':
+              field = form.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
+              field.checked = true;
+              break;
+            case 'checkbox':
+              field.checked = json[name];
+              break;
+            default:
+              field.value = json[name];
+          }
+        }
+      }
+      this.showBoxUserEdit();
+    });
+  }
+
+  showBoxUserCreate() {
+    document.querySelector("#box-user-create").style.display = "block";
+    document.querySelector("#box-user-edit").style.display = "none";
+  }
+
+  showBoxUserEdit() {
+    document.querySelector("#box-user-create").style.display = "none";
+    document.querySelector("#box-user-edit").style.display = "block";
+  }
+
   updateCount() {
+
     let numberUsers = 0;
     let numberAdmin = 0;
+
     [...this.tableEl.children].forEach(tr=>{
       numberUsers++;
       let user = JSON.parse(tr.dataset.user);
       if(user._admin) numberAdmin++;
     });
+
     document.querySelector('#number-users').innerHTML = numberUsers;
     document.querySelector('#number-users-admin').innerHTML = numberAdmin;
   }

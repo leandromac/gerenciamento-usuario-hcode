@@ -17,25 +17,43 @@ class UserController {
       let btn = this.formEdit.querySelector("[type=submit]");
       btn.desabled = true;
       let values = this.getValues(this.formEdit);
-      console.log(formEdit);
-      let index = this.form.dataset.trIndex;
+      let index = this.formEdit.dataset.trIndex;
       let tr = this.tableEl.rows[index];
-      this.tableEl.rows[index].dataset.user = JSON.stringify(values);
-      tr.innerHTML = `
-      <tr>
-        <td><img src="${values.photo}" alt="User Image" class="img-circle img-sm"></td>
-        <td>${values.name}</td>
-        <td>${values.email}</td>
-        <td>${(values.admin) ? 'Sim' : 'Não'}</td>
-        <td>${Utils.dateFormat(values.register)}</td>
-        <td>
-          <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-          <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-        </td>
-      </tr>
-    `;
-    this.addEventsTr(tr);
-    this.updateCount();
+      let userOld = JSON.parse(tr.dataser.user);
+      let result = Object.assign({},userOld, values);
+ 
+    this.showPanelCreate();
+    this.getPhoto(this.formEl).then(
+      (content) => {
+        if(!values.photo) {
+          result._photo = userOld._photo;
+        } else {
+          result._photo = content;
+        }
+        tr.dataset.user = JSON.stringify(result);
+        tr.innerHTML = `
+        <tr>
+          <td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
+          <td>${result._name}</td>
+          <td>${result._email}</td>
+          <td>${(result._admin) ? 'Sim' : 'Não'}</td>
+          <td>${Utils.dateFormat(result._register)}</td>
+          <td>
+            <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
+            <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+          </td>
+        </tr>
+      `;
+      this.addEventsTr(tr);
+      this.updateCount();
+      this.formEdit.reset();
+      btn.disabled = false;
+      
+      },
+      (e) => {
+        console.error(e);
+      }
+    );
     });
   }
 
@@ -49,7 +67,7 @@ class UserController {
       let values = this.getValues(this.formEl);
       if(!values) return false;
 
-      this.getPhoto().then(
+      this.getPhoto(this.formEl).then(
         (content) => {
           values.photo = content;
           this.addLine(values);
@@ -65,12 +83,12 @@ class UserController {
     
   }
 
-  getPhoto() {
+  getPhoto(formEl) {
 
     return new Promise((resolve, reject) => {
 
       let fileReader = new FileReader();
-      let elements = [...this.formEl.elements].filter(item => {
+      let elements = [...formEl.elements].filter(item => {
         if(item.name === 'photo') {
           return item;
         }

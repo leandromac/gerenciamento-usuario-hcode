@@ -17,10 +17,10 @@ class UserController {
       event.preventDefault();
       let btn = this.formEdit.querySelector("[type=submit]");
       btn.desabled = true;
-      let values = this.getValues(this.formEdit);
-      let index = this.formEdit.dataset.trIndex;
-      let tr = this.tableEl.rows[index];
-      let userOld = JSON.parse(tr.dataser.user);
+      let values = this.getValues(this.formEdit)
+      let index = this.formEdit.dataset.trIndex
+      let tr = this.tableEl.rows[index]
+      let userOld = JSON.parse(tr.dataser.user)
       let result = Object.assign({},userOld, values);
  
     this.showPanelCreate();
@@ -32,7 +32,8 @@ class UserController {
           result._photo = content
         }
       let user = new User()
-      user.loadFromJSON(result);
+      user.loadFromJSON(result)
+      user.save()
       this.getTr(user, tr)
       this.updateCount()
       this.formEdit.reset()
@@ -58,14 +59,14 @@ class UserController {
 
       this.getPhoto(this.formEl).then(
         (content) => {
-          values.photo = content;
-          this.insert(values);
-          this.addLine(values);
-          this.formEl.reset();
-          btnSubmit.disabled = false;
+          values.photo = content
+          values.save()
+          this.addLine(values)
+          this.formEl.reset()
+          btnSubmit.disabled = false
         },
         (e) => {
-          console.error(e);
+          console.error(e)
         }
       );
 
@@ -77,7 +78,7 @@ class UserController {
 
     return new Promise((resolve, reject) => {
 
-      let fileReader = new FileReader();
+      let fileReader = new FileReader()
       let elements = [...formEl.elements].filter(item => {
         if(item.name === 'photo') {
           return item;
@@ -154,13 +155,6 @@ class UserController {
       user.loadFromJSON(dataUser)
       this.addline(user)
     })
-  }
-
-  insert(data) {
-    let users = this.getUsersStorage()
-    users.push(data)
-    // sessionStorage.setItem("users", JSON.stringify(users))
-    localStorage.setItem("users", JSON.stringify(users))
   }
 
   addLine(dataUser) {
